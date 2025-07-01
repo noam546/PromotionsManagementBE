@@ -7,18 +7,15 @@ export class PromotionController {
         try {
             const page = parseInt(req.query.page as string) || 1
             const limit = parseInt(req.query.limit as string) || 10
+
             const filters = {
-                isActive: req.query.isActive !== undefined ? req.query.isActive === 'true' : undefined,
                 type: req.query.type as string,
                 userGroupName: req.query.userGroupName as string,
                 search: req.query.search as string,
                 startDate: req.query.startDate ? new Date(req.query.startDate as string) : undefined,
                 endDate: req.query.endDate ? new Date(req.query.endDate as string) : undefined,
-                includeDeleted: req.query.includeDeleted === 'true'
             }
-
             const result = await promotionService.getAllPromotions(filters, page, limit)
-            
             res.json({
                 success: true,
                 data: result.data,
@@ -26,28 +23,10 @@ export class PromotionController {
                 message: 'Promotions retrieved successfully'
             })
         } catch (error) {
+            console.log("errasdsdffdsddsor",error)
             res.status(500).json({
                 success: false,
                 message: 'Error retrieving promotions',
-                error: error instanceof Error ? error.message : 'Unknown error'
-            })
-        }
-    }
-
-    // GET /api/promotions/active
-    public static async getActivePromotions(req: Request, res: Response): Promise<void> {
-        try {
-            const promotions = await promotionService.getActivePromotions()
-            
-            res.json({
-                success: true,
-                data: promotions,
-                message: 'Active promotions retrieved successfully'
-            })
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error retrieving active promotions',
                 error: error instanceof Error ? error.message : 'Unknown error'
             })
         }
@@ -57,9 +36,8 @@ export class PromotionController {
     public static async getPromotionById(req: Request, res: Response): Promise<void> {
         try {
             const { id } = req.params
-            const includeDeleted = req.query.includeDeleted === 'true'
             
-            const promotion = await promotionService.getPromotionById(id, includeDeleted)
+            const promotion = await promotionService.getPromotionById(id)
             
             if (!promotion) {
                 res.status(404).json({
@@ -86,10 +64,10 @@ export class PromotionController {
     // POST /api/promotions
     public static async createPromotion(req: Request, res: Response): Promise<void> {
         try {
-            const { name, userGroupName, type, startDate, endDate, isActive } = req.body
+            const { promotionName, userGroupName, type, startDate, endDate } = req.body
             
             // Basic validation
-            if (!name || !userGroupName || !type || !startDate || !endDate) {
+            if (!promotionName || !userGroupName || !type || !startDate || !endDate) {
                 res.status(400).json({
                     success: false,
                     message: 'Name, userGroupName, type, startDate, and endDate are required'
@@ -107,12 +85,11 @@ export class PromotionController {
             }
 
             const promotionData = {
-                name,
+                promotionName,
                 userGroupName,
                 type,
                 startDate: new Date(startDate),
                 endDate: new Date(endDate),
-                isActive: isActive !== undefined ? isActive : true
             }
 
             const promotion = await promotionService.createPromotion(promotionData)
@@ -195,7 +172,7 @@ export class PromotionController {
             
             res.json({
                 success: true,
-                message: 'Promotion soft deleted successfully'
+                message: 'Promotion deleted successfully'
             })
         } catch (error) {
             res.status(500).json({
@@ -206,81 +183,4 @@ export class PromotionController {
         }
     }
 
-    // DELETE /api/promotions/:id/hard (Hard Delete)
-    public static async hardDeletePromotion(req: Request, res: Response): Promise<void> {
-        try {
-            const { id } = req.params
-            
-            const deleted = await promotionService.hardDeletePromotion(id)
-            
-            if (!deleted) {
-                res.status(404).json({
-                    success: false,
-                    message: 'Promotion not found'
-                })
-                return
-            }
-            
-            res.json({
-                success: true,
-                message: 'Promotion permanently deleted successfully'
-            })
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error permanently deleting promotion',
-                error: error instanceof Error ? error.message : 'Unknown error'
-            })
-        }
-    }
-
-    // PATCH /api/promotions/:id/deactivate
-    public static async deactivatePromotion(req: Request, res: Response): Promise<void> {
-        try {
-            const { id } = req.params
-            
-            const promotion = await promotionService.deactivatePromotion(id)
-            
-            if (!promotion) {
-                res.status(404).json({
-                    success: false,
-                    message: 'Promotion not found'
-                })
-                return
-            }
-            
-            res.json({
-                success: true,
-                data: promotion,
-                message: 'Promotion deactivated and soft deleted successfully'
-            })
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error deactivating promotion',
-                error: error instanceof Error ? error.message : 'Unknown error'
-            })
-        }
-    }
-
-    // GET /api/promotions/user-group/:userGroupName
-    public static async getPromotionsByUserGroup(req: Request, res: Response): Promise<void> {
-        try {
-            const { userGroupName } = req.params
-
-            const promotions = await promotionService.getPromotionsByUserGroup(userGroupName)
-            
-            res.json({
-                success: true,
-                data: promotions,
-                message: 'Promotions for user group retrieved successfully'
-            })
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error retrieving promotions for user group',
-                error: error instanceof Error ? error.message : 'Unknown error'
-            })
-        }
-    }
 } 

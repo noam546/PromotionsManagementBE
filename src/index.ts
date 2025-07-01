@@ -1,14 +1,22 @@
 import * as express from 'express'
+// import cors from 'cors'
 import promotionRoutes from './routes/promotionRoutes'
 import { errorHandler, notFound } from './middleware/errorHandler'
 import config, { validateConfig } from './config'
 import databaseConnection from './database/connection'
+
+const cors = require('cors')
 
 // Validate configuration on startup
 validateConfig()
 
 const app: express.Application = express()
 
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 

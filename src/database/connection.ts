@@ -21,8 +21,7 @@ export class DatabaseConnection {
     }
 
     try {
-      const mongoUri = `${config.database.url}/${config.database.name}`
-      
+      const mongoUri = `mongodb+srv://candidate:EchKvy7r7UCLvluf@operationscluster.64btjvn.mongodb.net/operations?retryWrites=true&w=majority`
       await mongoose.connect(mongoUri, {
         maxPoolSize: 10,
         serverSelectionTimeoutMS: 5000,
@@ -62,7 +61,7 @@ export class DatabaseConnection {
     try {
       await mongoose.disconnect()
       this.isConnected = false
-      console.log('📴 Disconnected from MongoDB')
+      console.log('Disconnected from MongoDB')
     } catch (error) {
       console.error('Error disconnecting from MongoDB:', error)
       throw error

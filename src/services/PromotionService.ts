@@ -7,16 +7,11 @@ import promotionRepository, {
 
 export interface PromotionResponse {
   id: string
-  name: string
+  promotionName: string
   userGroupName: string
   type: string
   startDate: Date
   endDate: Date
-  isActive: boolean
-  isDeleted: boolean
-  isValid: boolean
-  createdAt: Date
-  updatedAt: Date
 }
 
 export interface PaginatedResponse<T> {
@@ -31,24 +26,13 @@ export interface PaginatedResponse<T> {
 
 export class PromotionService {
   private transformPromotion(promotion: IPromotion): PromotionResponse {
-    const now = new Date()
-    const isValid = promotion.isActive && 
-                   !promotion.isDeleted && 
-                   promotion.startDate <= now && 
-                   promotion.endDate >= now
-
     return {
       id: promotion._id.toString(),
-      name: promotion.name,
+      promotionName: promotion.promotionName,
       userGroupName: promotion.userGroupName,
       type: promotion.type,
       startDate: promotion.startDate,
       endDate: promotion.endDate,
-      isActive: promotion.isActive,
-      isDeleted: promotion.isDeleted,
-      isValid,
-      createdAt: promotion.createdAt,
-      updatedAt: promotion.updatedAt
     }
   }
 
@@ -62,8 +46,8 @@ export class PromotionService {
     return this.transformPromotion(promotion)
   }
 
-  async getPromotionById(id: string, includeDeleted: boolean = false): Promise<PromotionResponse | null> {
-    const promotion = await promotionRepository.findById(id, includeDeleted)
+  async getPromotionById(id: string): Promise<PromotionResponse | null> {
+    const promotion = await promotionRepository.findById(id)
     if (!promotion) {
       return null
     }
@@ -88,11 +72,6 @@ export class PromotionService {
     }
   }
 
-  async getActivePromotions(): Promise<PromotionResponse[]> {
-    const promotions = await promotionRepository.findActivePromotions()
-    return promotions.map(promotion => this.transformPromotion(promotion))
-  }
-
   async updatePromotion(id: string, data: UpdatePromotionData): Promise<PromotionResponse | null> {
     // Business logic validation
     if (data.startDate && data.endDate && data.startDate >= data.endDate) {
@@ -108,23 +87,6 @@ export class PromotionService {
 
   async deletePromotion(id: string): Promise<boolean> {
     return await promotionRepository.delete(id)
-  }
-
-  async hardDeletePromotion(id: string): Promise<boolean> {
-    return await promotionRepository.hardDelete(id)
-  }
-
-  async deactivatePromotion(id: string): Promise<PromotionResponse | null> {
-    const promotion = await promotionRepository.softDelete(id)
-    if (!promotion) {
-      return null
-    }
-    return this.transformPromotion(promotion)
-  }
-
-  async getPromotionsByUserGroup(userGroupName: string): Promise<PromotionResponse[]> {
-    const promotions = await promotionRepository.findByUserGroup(userGroupName)
-    return promotions.map(promotion => this.transformPromotion(promotion))
   }
 }
 

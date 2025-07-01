@@ -1,8 +1,16 @@
 import * as dotenv from 'dotenv'
 import * as path from 'path'
+import * as fs from 'fs'
 
-// Load environment variables from .env file
-dotenv.config({ path: path.resolve(process.cwd(), '.env') })
+// Prefer .env.local if it exists, otherwise fallback to .env
+const envLocalPath = path.resolve(process.cwd(), 'env.local')
+const envPath = path.resolve(process.cwd(), '.env')
+
+if (fs.existsSync(envLocalPath)) {
+  dotenv.config({ path: envLocalPath })
+} else {
+  dotenv.config({ path: envPath })
+}
 
 export interface Config {
   port: number

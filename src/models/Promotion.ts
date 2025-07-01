@@ -1,19 +1,17 @@
 import mongoose, { Document, Schema } from 'mongoose'
 
 export interface IPromotion extends Document {
-  name: string
+  promotionName: string
   userGroupName: string
   type: 'event' | 'sale' | 'bonus'
   startDate: Date
   endDate: Date
   isActive: boolean
   isDeleted: boolean
-  createdAt: Date
-  updatedAt: Date
 }
 
 const PromotionSchema = new Schema<IPromotion>({
-  name: {
+  promotionName: {
     type: String,
     required: [true, 'Promotion name is required'],
     trim: true,
@@ -67,12 +65,6 @@ PromotionSchema.pre('save', function(next) {
     next(new Error('End date must be after start date'))
   }
   next()
-})
-
-// Virtual for checking if promotion is currently valid
-PromotionSchema.virtual('isValid').get(function() {
-  const now = new Date()
-  return this.isActive && !this.isDeleted && this.startDate <= now && this.endDate >= now
 })
 
 export default mongoose.model<IPromotion>('Promotion', PromotionSchema) 
