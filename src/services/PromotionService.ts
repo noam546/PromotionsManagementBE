@@ -114,14 +114,6 @@ export class PromotionService {
     return await promotionRepository.hardDelete(id)
   }
 
-  async restorePromotion(id: string): Promise<PromotionResponse | null> {
-    const promotion = await promotionRepository.restore(id)
-    if (!promotion) {
-      return null
-    }
-    return this.transformPromotion(promotion)
-  }
-
   async deactivatePromotion(id: string): Promise<PromotionResponse | null> {
     const promotion = await promotionRepository.softDelete(id)
     if (!promotion) {
@@ -133,54 +125,6 @@ export class PromotionService {
   async getPromotionsByUserGroup(userGroupName: string): Promise<PromotionResponse[]> {
     const promotions = await promotionRepository.findByUserGroup(userGroupName)
     return promotions.map(promotion => this.transformPromotion(promotion))
-  }
-
-  async getDeletedPromotions(): Promise<PromotionResponse[]> {
-    const promotions = await promotionRepository.findDeletedPromotions()
-    return promotions.map(promotion => this.transformPromotion(promotion))
-  }
-
-  async getPromotionStats(): Promise<{
-    total: number
-    active: number
-    expired: number
-    upcoming: number
-    deleted: number
-    byType: {
-      event: number
-      sale: number
-      bonus: number
-    }
-  }> {
-    const now = new Date()
-    
-    const [total, totalWithDeleted, activePromotions] = await Promise.all([
-      promotionRepository.count(false), // Non-deleted count
-      promotionRepository.count(true),  // Total count including deleted
-      promotionRepository.findActivePromotions()
-    ])
-
-    const deletedCount = totalWithDeleted - total
-
-    const active = activePromotions.length
-    const expired = activePromotions.filter(p => p.endDate < now).length
-    const upcoming = activePromotions.filter(p => p.startDate > now).length
-
-    // Count by type (only non-deleted)
-    const byType = {
-      event: activePromotions.filter(p => p.type === 'event').length,
-      sale: activePromotions.filter(p => p.type === 'sale').length,
-      bonus: activePromotions.filter(p => p.type === 'bonus').length
-    }
-
-    return {
-      total,
-      active,
-      expired,
-      upcoming,
-      deleted: deletedCount,
-      byType
-    }
   }
 }
 

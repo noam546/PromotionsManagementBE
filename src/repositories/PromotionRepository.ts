@@ -156,18 +156,6 @@ export class PromotionRepository {
     }
   }
 
-  async restore(id: string): Promise<IPromotion | null> {
-    try {
-      return await Promotion.findOneAndUpdate(
-        { _id: id, isDeleted: true },
-        { isDeleted: false, updatedAt: new Date() },
-        { new: true }
-      )
-    } catch (error) {
-      throw new Error(`Failed to restore promotion: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
-  }
-
   async softDelete(id: string): Promise<IPromotion | null> {
     try {
       return await Promotion.findOneAndUpdate(
@@ -204,16 +192,6 @@ export class PromotionRepository {
       }).sort({ createdAt: -1 }).lean()
     } catch (error) {
       throw new Error(`Failed to find promotions by user group: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    }
-  }
-
-  async findDeletedPromotions(): Promise<IPromotion[]> {
-    try {
-      return await Promotion.find({ isDeleted: true })
-        .sort({ updatedAt: -1 })
-        .lean()
-    } catch (error) {
-      throw new Error(`Failed to find deleted promotions: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 }

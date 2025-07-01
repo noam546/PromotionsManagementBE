@@ -53,44 +53,6 @@ export class PromotionController {
         }
     }
 
-    // GET /api/promotions/deleted
-    public static async getDeletedPromotions(req: Request, res: Response): Promise<void> {
-        try {
-            const promotions = await promotionService.getDeletedPromotions()
-            
-            res.json({
-                success: true,
-                data: promotions,
-                message: 'Deleted promotions retrieved successfully'
-            })
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error retrieving deleted promotions',
-                error: error instanceof Error ? error.message : 'Unknown error'
-            })
-        }
-    }
-
-    // GET /api/promotions/stats
-    public static async getPromotionStats(req: Request, res: Response): Promise<void> {
-        try {
-            const stats = await promotionService.getPromotionStats()
-            
-            res.json({
-                success: true,
-                data: stats,
-                message: 'Promotion statistics retrieved successfully'
-            })
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error retrieving promotion statistics',
-                error: error instanceof Error ? error.message : 'Unknown error'
-            })
-        }
-    }
-
     // GET /api/promotions/:id
     public static async getPromotionById(req: Request, res: Response): Promise<void> {
         try {
@@ -267,35 +229,6 @@ export class PromotionController {
             res.status(500).json({
                 success: false,
                 message: 'Error permanently deleting promotion',
-                error: error instanceof Error ? error.message : 'Unknown error'
-            })
-        }
-    }
-
-    // PATCH /api/promotions/:id/restore
-    public static async restorePromotion(req: Request, res: Response): Promise<void> {
-        try {
-            const { id } = req.params
-            
-            const promotion = await promotionService.restorePromotion(id)
-            
-            if (!promotion) {
-                res.status(404).json({
-                    success: false,
-                    message: 'Promotion not found or not deleted'
-                })
-                return
-            }
-            
-            res.json({
-                success: true,
-                data: promotion,
-                message: 'Promotion restored successfully'
-            })
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error restoring promotion',
                 error: error instanceof Error ? error.message : 'Unknown error'
             })
         }
