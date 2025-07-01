@@ -21,7 +21,8 @@ export class DatabaseConnection {
     }
 
     try {
-      const mongoUri = `mongodb+srv://candidate:EchKvy7r7UCLvluf@operationscluster.64btjvn.mongodb.net/operations?retryWrites=true&w=majority`
+      // const mongoUri = `mongodb+srv://candidate:EchKvy7r7UCLvluf@operationscluster.64btjvn.mongodb.net/operations?retryWrites=true&w=majority`
+      const mongoUri = 'mongodb://localhost:27017/myLocalDb'
       await mongoose.connect(mongoUri, {
         maxPoolSize: 10,
         serverSelectionTimeoutMS: 5000,

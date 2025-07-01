@@ -6,8 +6,6 @@ export interface IPromotion extends Document {
   type: 'event' | 'sale' | 'bonus'
   startDate: Date
   endDate: Date
-  isActive: boolean
-  isDeleted: boolean
 }
 
 const PromotionSchema = new Schema<IPromotion>({
@@ -39,25 +37,15 @@ const PromotionSchema = new Schema<IPromotion>({
     type: Date,
     required: [true, 'End date is required']
   },
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  isDeleted: {
-    type: Boolean,
-    default: false
-  }
 }, {
   timestamps: true,
   collection: 'promotions'
 })
 
 // Indexes for better query performance
-PromotionSchema.index({ isActive: 1, isDeleted: 1, startDate: 1, endDate: 1 })
-PromotionSchema.index({ type: 1, isDeleted: 1 })
-PromotionSchema.index({ userGroupName: 1, isDeleted: 1 })
-PromotionSchema.index({ createdAt: -1, isDeleted: 1 })
-PromotionSchema.index({ isDeleted: 1 }) // General soft delete index
+PromotionSchema.index({ startDate: 1, endDate: 1 })
+PromotionSchema.index({ type: 1 })
+PromotionSchema.index({ userGroupName: 1 })
 
 // Pre-save middleware to validate dates
 PromotionSchema.pre('save', function(next) {

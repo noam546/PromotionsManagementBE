@@ -1,7 +1,9 @@
 import { Request, Response } from 'express'
-import promotionService from '../services/PromotionService'
+import { emitPromotionEvent } from '../index' // Import the helper function
+import PromotionService from '../services/PromotionService'
 
 export class PromotionController {
+
     // GET /api/promotions
     public static async getAllPromotions(req: Request, res: Response): Promise<void> {
         const page = parseInt(req.query.page as string) || 1
@@ -13,12 +15,10 @@ export class PromotionController {
             startDate: req.query.startDate ? new Date(req.query.startDate as string) : undefined,
             endDate: req.query.endDate ? new Date(req.query.endDate as string) : undefined,
         }
-        const result = await promotionService.getAllPromotions(filters, page, limit)
+        const result = await PromotionService.getAllPromotions(filters, page, limit)
         res.json({
-            success: true,
             data: result.data,
             pagination: result.pagination,
-            message: 'Promotions retrieved successfully'
         })   
     }
 
@@ -27,7 +27,7 @@ export class PromotionController {
         try {
             const { id } = req.params
             
-            const promotion = await promotionService.getPromotionById(id)
+            const promotion = await PromotionService.getPromotionById(id)
             
             if (!promotion) {
                 res.status(404).json({
@@ -38,9 +38,7 @@ export class PromotionController {
             }
             
             res.json({
-                success: true,
                 data: promotion,
-                message: 'Promotion retrieved successfully'
             })
         } catch (error) {
             res.status(500).json({
@@ -50,127 +48,55 @@ export class PromotionController {
             })
         }
     }
-
-    // POST /api/promotions
-    public static async createPromotion(req: Request, res: Response): Promise<void> {
+    // POST /api/promotions - Create new promotion
+    static async createPromotion(req: Request, res: Response) {
         try {
-            const { promotionName, userGroupName, type, startDate, endDate } = req.body
+            // Your existing logic to create promotion
+            const newPromotion = await PromotionService.createPromotion(req.body)
             
-            // Basic validation
-            if (!promotionName || !userGroupName || !type || !startDate || !endDate) {
-                res.status(400).json({
-                    success: false,
-                    message: 'Name, userGroupName, type, startDate, and endDate are required'
-                })
-                return
-            }
-
-            // Validate promotion type
-            if (!['event', 'sale', 'bonus'].includes(type)) {
-                res.status(400).json({
-                    success: false,
-                    message: 'Type must be event, sale, or bonus'
-                })
-                return
-            }
-
-            const promotionData = {
-                promotionName,
-                userGroupName,
-                type,
-                startDate: new Date(startDate),
-                endDate: new Date(endDate),
-            }
-
-            const promotion = await promotionService.createPromotion(promotionData)
-            
-            res.status(201).json({
-                success: true,
-                data: promotion,
-                message: 'Promotion created successfully'
+            // Emit WebSocket event after successful creation
+            emitPromotionEvent('promotion_created', {
+                promotion: newPromotion
             })
+            
+            res.status(201).json(newPromotion)
         } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error creating promotion',
-                error: error instanceof Error ? error.message : 'Unknown error'
-            })
+            res.status(500).json({ error: error.message })
         }
     }
 
-    // PUT /api/promotions/:id
-    public static async updatePromotion(req: Request, res: Response): Promise<void> {
+    // PUT /api/promotions/:id - Update promotion
+    static async updatePromotion(req: Request, res: Response) {
         try {
-            const { id } = req.params
-            const updateData = req.body
-
-            // Convert date strings to Date objects if provided
-            if (updateData.startDate) {
-                updateData.startDate = new Date(updateData.startDate)
-            }
-            if (updateData.endDate) {
-                updateData.endDate = new Date(updateData.endDate)
-            }
-
-            // Validate promotion type if provided
-            if (updateData.type && !['event', 'sale', 'bonus'].includes(updateData.type)) {
-                res.status(400).json({
-                    success: false,
-                    message: 'Type must be event, sale, or bonus'
-                })
-                return
-            }
-
-            const promotion = await promotionService.updatePromotion(id, updateData)
             
-            if (!promotion) {
-                res.status(404).json({
-                    success: false,
-                    message: 'Promotion not found'
-                })
-                return
-            }
+            // Your existing logic to update promotion
+            const updatedPromotion = await PromotionService.updatePromotion(req.params.id, req.body)
             
-            res.json({
-                success: true,
-                data: promotion,
-                message: 'Promotion updated successfully'
+            // Emit WebSocket event after successful update
+            emitPromotionEvent('promotion_updated', {
+                promotion: updatedPromotion,
             })
+            
+            res.json(updatedPromotion)
         } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error updating promotion',
-                error: error instanceof Error ? error.message : 'Unknown error'
-            })
+            res.status(500).json({ error: error.message })
         }
     }
 
-    // DELETE /api/promotions/:id (Soft Delete)
-    public static async deletePromotion(req: Request, res: Response): Promise<void> {
+    // DELETE /api/promotions/:id - Soft delete promotion
+    static async deletePromotion(req: Request, res: Response) {
         try {
-            const { id } = req.params
+            // Your existing logic to soft delete promotion
+            await PromotionService.deletePromotion(req.params.id)
             
-            const deleted = await promotionService.deletePromotion(id)
-            
-            if (!deleted) {
-                res.status(404).json({
-                    success: false,
-                    message: 'Promotion not found'
-                })
-                return
-            }
-            
-            res.json({
-                success: true,
-                message: 'Promotion deleted successfully'
+            // Emit WebSocket event after successful deletion
+            emitPromotionEvent('promotion_deleted', {
+                promotionId: req.params.id
             })
+            
+            res.status(204).send()
         } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error deleting promotion',
-                error: error instanceof Error ? error.message : 'Unknown error'
-            })
+            res.status(500).json({ error: error.message })
         }
     }
-
-} 
+}
