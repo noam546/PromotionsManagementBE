@@ -4,32 +4,22 @@ import promotionService from '../services/PromotionService'
 export class PromotionController {
     // GET /api/promotions
     public static async getAllPromotions(req: Request, res: Response): Promise<void> {
-        try {
-            const page = parseInt(req.query.page as string) || 1
-            const limit = parseInt(req.query.limit as string) || 10
-
-            const filters = {
-                type: req.query.type as string,
-                userGroupName: req.query.userGroupName as string,
-                search: req.query.search as string,
-                startDate: req.query.startDate ? new Date(req.query.startDate as string) : undefined,
-                endDate: req.query.endDate ? new Date(req.query.endDate as string) : undefined,
-            }
-            const result = await promotionService.getAllPromotions(filters, page, limit)
-            res.json({
-                success: true,
-                data: result.data,
-                pagination: result.pagination,
-                message: 'Promotions retrieved successfully'
-            })
-        } catch (error) {
-            console.log("errasdsdffdsddsor",error)
-            res.status(500).json({
-                success: false,
-                message: 'Error retrieving promotions',
-                error: error instanceof Error ? error.message : 'Unknown error'
-            })
+        const page = parseInt(req.query.page as string) || 1
+        const limit = parseInt(req.query.limit as string) || 10
+        const filters = {
+            type: req.query.type as string,
+            userGroupName: req.query.userGroupName as string,
+            search: req.query.search as string,
+            startDate: req.query.startDate ? new Date(req.query.startDate as string) : undefined,
+            endDate: req.query.endDate ? new Date(req.query.endDate as string) : undefined,
         }
+        const result = await promotionService.getAllPromotions(filters, page, limit)
+        res.json({
+            success: true,
+            data: result.data,
+            pagination: result.pagination,
+            message: 'Promotions retrieved successfully'
+        })   
     }
 
     // GET /api/promotions/:id

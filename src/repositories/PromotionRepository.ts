@@ -46,48 +46,44 @@ export class PromotionRepository {
   }
 
   async findAll(filters: PromotionFilters = {}, page: number = 1, limit: number = 10): Promise<{ promotions: IPromotion[], total: number, page: number, totalPages: number }> {
-    try {
-      const query: any = {}
+    const query: any = {}
 
-      if (filters.type) {
-        query.type = filters.type
-      }
+    if (filters.type) {
+      query.type = filters.type
+    }
 
-      if (filters.userGroupName) {
-        query.userGroupName = filters.userGroupName
-      }
+    if (filters.userGroupName) {
+      query.userGroupName = filters.userGroupName
+    }
 
-      if (filters.startDate || filters.endDate) {
-        query.startDate = {}
-        if (filters.startDate) query.startDate.$gte = filters.startDate
-        if (filters.endDate) query.startDate.$lte = filters.endDate
-      }
+    if (filters.startDate || filters.endDate) {
+      query.startDate = {}
+      if (filters.startDate) query.startDate.$gte = filters.startDate
+      if (filters.endDate) query.startDate.$lte = filters.endDate
+    }
 
-      if (filters.search) {
-        query.$or = [
-          { name: { $regex: filters.search, $options: 'i' } },
-          { userGroupName: { $regex: filters.search, $options: 'i' } }
-        ]
-      }
+    if (filters.search) {
+      query.$or = [
+        { name: { $regex: filters.search, $options: 'i' } },
+        { userGroupName: { $regex: filters.search, $options: 'i' } }
+      ]
+    }
 
-      const skip = (page - 1) * limit
-      const [promotions, total] = await Promise.all([
-        Promotion.find(query)
-          .sort({ createdAt: -1 })
-          .skip(skip)
-          .limit(limit)
-          .lean(),
-        Promotion.countDocuments(query)
-      ])
-      
-      return {
-        promotions,
-        total,
-        page,
-        totalPages: Math.ceil(total / limit)
-      }
-    } catch (error) {
-      throw new Error(`Failed to find promotions: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    const skip = (page - 1) * limit
+    const [promotions, total] = await Promise.all([
+      Promotion.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Promotion.countDocuments(query)
+    ])
+
+    return {
+      promotions,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit)
     }
   }
 
