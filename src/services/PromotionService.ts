@@ -73,6 +73,7 @@ export class PromotionService {
   }
 
   async updatePromotion(id: string, data: UpdatePromotionData): Promise<PromotionResponse | null> {
+
     // Business logic validation
     if (data.startDate && data.endDate && data.startDate >= data.endDate) {
       throw new Error('End date must be after start date')

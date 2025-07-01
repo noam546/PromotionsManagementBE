@@ -89,9 +89,10 @@ export class PromotionRepository {
 
   async update(id: string, data: UpdatePromotionData): Promise<IPromotion | null> {
     try {
+
       return await Promotion.findOneAndUpdate(
-        { _id: id, isDeleted: false },
-        { ...data, updatedAt: new Date() },
+        { _id: id },
+        { ...data },
         { new: true, runValidators: true }
       )
     } catch (error) {

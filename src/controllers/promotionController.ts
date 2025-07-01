@@ -71,7 +71,7 @@ export class PromotionController {
             
             // Your existing logic to update promotion
             const updatedPromotion = await PromotionService.updatePromotion(req.params.id, req.body)
-            
+
             // Emit WebSocket event after successful update
             emitPromotionEvent('promotion_updated', {
                 promotion: updatedPromotion,
