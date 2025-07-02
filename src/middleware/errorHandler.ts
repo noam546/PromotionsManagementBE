@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
+import config from '../config'
 
 export interface CustomError extends Error {
     statusCode?: number
@@ -16,7 +17,7 @@ export const errorHandler = (
     res.status(statusCode).json({
         success: false,
         message,
-        ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+        ...(config.nodeEnv === 'development' && { stack: err.stack })
     })
 }
 

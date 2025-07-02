@@ -1,6 +1,5 @@
 import mongoose from 'mongoose'
-
-const DATABASE_URL = process.env.DATABASE_URL
+import config from '../config'
 export class DatabaseConnection {
   private static instance: DatabaseConnection
   private isConnected = false
@@ -21,7 +20,7 @@ export class DatabaseConnection {
     }
 
     try {
-      const mongoUri = DATABASE_URL
+      const mongoUri = config.database.url
       await mongoose.connect(mongoUri, {
         maxPoolSize: 10,
         serverSelectionTimeoutMS: 5000,

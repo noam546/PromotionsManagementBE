@@ -3,20 +3,16 @@ import { createServer } from 'http'
 import { Server } from 'socket.io'
 import promotionRoutes from './routes/promotionRoutes'
 import { errorHandler, notFound } from './middleware/errorHandler'
-import config, { validateConfig } from './config'
+import config from './config'
 import databaseConnection from './database/connection'
-
-const REACT_APP_URL = process.env.REACT_APP_URL
 const cors = require('cors')
-
-validateConfig()
 
 const app: express.Application = express()
 const server = createServer(app)
 
 const io = new Server(server, {
   cors: {
-    origin: REACT_APP_URL, 
+    origin: config.reactAppUrl, 
     methods: ["GET", "POST"]
   }
 })
@@ -75,6 +71,8 @@ export const emitPromotionEvent = (eventType: string, data: any) => {
 
 async function startServer() {
     try {
+
+        
         await databaseConnection.connect()
         
         server.listen(config.port, () => {

@@ -15,37 +15,23 @@ if (fs.existsSync(envLocalPath)) {
 export interface Config {
   port: number
   nodeEnv: string
+  reactAppUrl: string
 
   database: {
     url: string
-    name: string
   }
 }
 
 const config: Config = {
   port: parseInt(process.env.PORT || '8000', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
+  reactAppUrl: process.env.REACT_APP_URL || 'http://localhost:3000',
   
   database: {
     url: process.env.DATABASE_URL || 'mongodb://localhost:27017',
-    name: process.env.DATABASE_NAME || 'promotions_db',
   },
-
 }
 
-// Validation function
-export function validateConfig(): void {
-  const requiredEnvVars = [
-    // Add any required environment variables here
-    // 'DATABASE_URL',
-    // 'JWT_SECRET',
-  ]
-  
-  const missingVars = requiredEnvVars.filter(varName => !process.env[varName])
-  
-  if (missingVars.length > 0) {
-    throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`)
-  }
-}
+
 
 export default config 
