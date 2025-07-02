@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import config from '../config'
 
+const DATABASE_URL = process.env.DATABASE_URL
 export class DatabaseConnection {
   private static instance: DatabaseConnection
   private isConnected = false
@@ -22,7 +23,9 @@ export class DatabaseConnection {
 
     try {
       // const mongoUri = `mongodb+srv://candidate:EchKvy7r7UCLvluf@operationscluster.64btjvn.mongodb.net/operations?retryWrites=true&w=majority`
-      const mongoUri = 'mongodb://localhost:27017/myLocalDb'
+      // const mongoUri = 'mongodb://localhost:27017/local'
+      const mongoUri = DATABASE_URL
+      console.log('DATABASE_URL',DATABASE_URL)
       await mongoose.connect(mongoUri, {
         maxPoolSize: 10,
         serverSelectionTimeoutMS: 5000,
@@ -30,7 +33,7 @@ export class DatabaseConnection {
       })
 
       this.isConnected = true
-      console.log(`✅ Connected to MongoDB: ${config.database.name}`)
+      console.log(`Connected to MongoDB: ${config.database.name}`)
 
       // Handle connection events
       mongoose.connection.on('error', (error) => {
