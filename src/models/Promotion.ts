@@ -42,12 +42,11 @@ const PromotionSchema = new Schema<IPromotion>({
   collection: 'promotions'
 })
 
-// Indexes for better query performance
-PromotionSchema.index({ startDate: 1, endDate: 1 })
-PromotionSchema.index({ type: 1 })
-PromotionSchema.index({ userGroupName: 1 })
+PromotionSchema.index({ type: 1, userGroupName: 1, createdAt: -1 })
+PromotionSchema.index({ promotionName: 'text', userGroupName: 'text' })
+PromotionSchema.index({ startDate: 1 })
+PromotionSchema.index({ endDate: 1 })
 
-// Pre-save middleware to validate dates
 PromotionSchema.pre('save', function(next) {
   if (this.startDate >= this.endDate) {
     next(new Error('End date must be after start date'))

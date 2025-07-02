@@ -25,6 +25,11 @@ export interface PromotionFilters {
   search?: string
 }
 
+export interface SortOptions {
+  field: string
+  order: 'asc' | 'desc'
+}
+
 export class PromotionRepository {
   async create(data: CreatePromotionData): Promise<IPromotion> {
     try {
@@ -45,7 +50,12 @@ export class PromotionRepository {
     }
   }
 
-  async findAll(filters: PromotionFilters = {}, page: number = 1, limit: number = 10): Promise<{ promotions: IPromotion[], total: number, page: number, totalPages: number }> {
+  async findAll(
+    filters: PromotionFilters = {}, 
+    page: number = 1, 
+    limit: number = 10,
+    sort: SortOptions = { field: 'createdAt', order: 'desc' }
+  ): Promise<{ promotions: IPromotion[], total: number, page: number, totalPages: number }> {
     const query: any = {}
 
     if (filters.type) {
@@ -68,10 +78,13 @@ export class PromotionRepository {
         { userGroupName: { $regex: filters.search, $options: 'i' } }
       ]
     }
+    
     const skip = (page - 1) * limit
+    const sortOrder = sort.order === 'asc' ? 1 : -1
+    
     const [promotions, total] = await Promise.all([
       Promotion.find(query)
-        .sort({ createdAt: -1 })
+        .sort({ [sort.field]: sortOrder })
         .skip(skip)
         .limit(limit)
         .lean(),

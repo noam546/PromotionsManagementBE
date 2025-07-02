@@ -2,7 +2,8 @@ import { IPromotion } from '../models/Promotion'
 import promotionRepository, { 
   CreatePromotionData, 
   UpdatePromotionData, 
-  PromotionFilters 
+  PromotionFilters,
+  SortOptions
 } from '../repositories/PromotionRepository'
 
 export interface PromotionResponse {
@@ -37,7 +38,6 @@ export class PromotionService {
   }
 
   async createPromotion(data: CreatePromotionData): Promise<PromotionResponse> {
-    // Business logic validation
     if (data.startDate >= data.endDate) {
       throw new Error('End date must be after start date')
     }
@@ -57,9 +57,10 @@ export class PromotionService {
   async getAllPromotions(
     filters: PromotionFilters = {}, 
     page: number = 1, 
-    limit: number = 10
+    limit: number = 10,
+    sort: SortOptions = { field: 'createdAt', order: 'desc' }
   ): Promise<PaginatedResponse<PromotionResponse>> {
-    const result = await promotionRepository.findAll(filters, page, limit)
+    const result = await promotionRepository.findAll(filters, page, limit, sort)
     
     return {
       data: result.promotions.map(promotion => this.transformPromotion(promotion)),

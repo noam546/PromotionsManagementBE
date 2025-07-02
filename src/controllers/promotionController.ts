@@ -8,6 +8,18 @@ export class PromotionController {
     public static async getAllPromotions(req: Request, res: Response): Promise<void> {
         const page = parseInt(req.query.page as string) || 1
         const limit = parseInt(req.query.limit as string) || 10
+        
+        const sortField = req.query.sortBy as string || 'createdAt'
+        const sortOrder = (req.query.sortOrder as string || 'desc').toLowerCase() as 'asc' | 'desc'
+        
+        if (sortOrder !== 'asc' && sortOrder !== 'desc') {
+            res.status(400).json({
+                success: false,
+                message: 'sortOrder must be either "asc" or "desc"'
+            })
+            return
+        }
+        
         const filters = {
             type: req.query.type as string,
             userGroupName: req.query.userGroupName as string,
@@ -15,7 +27,13 @@ export class PromotionController {
             startDate: req.query.startDate ? new Date(req.query.startDate as string) : undefined,
             endDate: req.query.endDate ? new Date(req.query.endDate as string) : undefined,
         }
-        const result = await PromotionService.getAllPromotions(filters, page, limit)
+        
+        const sort = {
+            field: sortField,
+            order: sortOrder
+        }
+        
+        const result = await PromotionService.getAllPromotions(filters, page, limit, sort)
         res.json({
             data: result.data,
             pagination: result.pagination,
@@ -51,10 +69,8 @@ export class PromotionController {
     // POST /api/promotions - Create new promotion
     static async createPromotion(req: Request, res: Response) {
         try {
-            // Your existing logic to create promotion
             const newPromotion = await PromotionService.createPromotion(req.body)
             
-            // Emit WebSocket event after successful creation
             emitPromotionEvent('promotion_created', {
                 promotion: newPromotion
             })
@@ -69,10 +85,8 @@ export class PromotionController {
     static async updatePromotion(req: Request, res: Response) {
         try {
             
-            // Your existing logic to update promotion
             const updatedPromotion = await PromotionService.updatePromotion(req.params.id, req.body)
 
-            // Emit WebSocket event after successful update
             emitPromotionEvent('promotion_updated', {
                 promotion: updatedPromotion,
             })
@@ -86,10 +100,8 @@ export class PromotionController {
     // DELETE /api/promotions/:id - Soft delete promotion
     static async deletePromotion(req: Request, res: Response) {
         try {
-            // Your existing logic to soft delete promotion
             await PromotionService.deletePromotion(req.params.id)
             
-            // Emit WebSocket event after successful deletion
             emitPromotionEvent('promotion_deleted', {
                 promotionId: req.params.id
             })
