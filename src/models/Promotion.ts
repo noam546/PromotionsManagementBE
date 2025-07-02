@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose'
 export interface IPromotion extends Document {
   promotionName: string
   userGroupName: string
-  type: 'event' | 'sale' | 'bonus'
+  type: 'basic' | 'epic' | 'common'
   startDate: Date
   endDate: Date
 }
@@ -25,8 +25,8 @@ const PromotionSchema = new Schema<IPromotion>({
     type: String,
     required: [true, 'Promotion type is required'],
     enum: {
-      values: ['event', 'sale', 'bonus'],
-      message: 'Type must be event, sale, or bonus'
+      values: ['basic', 'epic', 'common'],
+      message: 'Type must be basic, epic, or common'
     }
   },
   startDate: {
