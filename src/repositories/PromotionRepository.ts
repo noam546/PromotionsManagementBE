@@ -64,11 +64,10 @@ export class PromotionRepository {
 
     if (filters.search) {
       query.$or = [
-        { name: { $regex: filters.search, $options: 'i' } },
+        { promotionName: { $regex: filters.search, $options: 'i' } },
         { userGroupName: { $regex: filters.search, $options: 'i' } }
       ]
     }
-
     const skip = (page - 1) * limit
     const [promotions, total] = await Promise.all([
       Promotion.find(query)
