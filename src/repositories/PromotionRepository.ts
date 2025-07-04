@@ -1,5 +1,6 @@
 import { IPromotion } from "../models"
-import Promotion from "../models/Promotion"
+import Promotion from "../models/promotion"
+import { DEFAULT_LIMIT, DEFAULT_PAGE, DEFAULT_SORT_FIELD, DEFAULT_SORT_ORDER } from "../utils"
 import { CreatePromotionData, UpdatePromotionData, PromotionFilters, SortOptions } from "./types"
 
 export class PromotionRepository {
@@ -24,9 +25,9 @@ export class PromotionRepository {
 
   async findAll(
     filters: PromotionFilters = {}, 
-    page: number = 1, 
-    limit: number = 10,
-    sort: SortOptions = { field: 'createdAt', order: 'desc' }
+    page: number = DEFAULT_PAGE, 
+    limit: number = DEFAULT_LIMIT,
+    sort: SortOptions = { field: DEFAULT_SORT_FIELD, order: DEFAULT_SORT_ORDER }
   ): Promise<{ promotions: IPromotion[], total: number, page: number, totalPages: number }> {
     const query: any = {}
 

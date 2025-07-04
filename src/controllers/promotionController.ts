@@ -1,16 +1,18 @@
 import { Request, Response } from 'express'
 import { emitPromotionEvent } from '../index' // Import the helper function
-import PromotionService from '../services/PromotionService'
+import PromotionService from '../services/promotionService'
 
 export class PromotionController {
 
     // GET /api/promotions
     public static async getAllPromotions(req: Request, res: Response): Promise<void> {
-        const page = parseInt(req.query.page as string) || 1
-        const limit = parseInt(req.query.limit as string) || 10
+        const { query : {page: pageStr, limit: limitStr, sortBy, sortOrder: sortOrderStr, type, userGroupName, search, startDate: startDateStr, endDate: endDateStr }} = req
         
-        const sortField = req.query.sortBy as string || 'createdAt'
-        const sortOrder = (req.query.sortOrder as string || 'desc').toLowerCase() as 'asc' | 'desc'
+        const page = parseInt(pageStr as string) || 1
+        const limit = parseInt(limitStr as string) || 10
+        
+        const sortField = sortBy as string || 'createdAt'
+        const sortOrder = (sortOrderStr as string || 'desc').toLowerCase() as 'asc' | 'desc'
         
         if (sortOrder !== 'asc' && sortOrder !== 'desc') {
             res.status(400).json({
@@ -21,11 +23,11 @@ export class PromotionController {
         }
         
         const filters = {
-            type: req.query.type as string,
-            userGroupName: req.query.userGroupName as string,
-            search: req.query.search as string,
-            startDate: req.query.startDate ? new Date(req.query.startDate as string) : undefined,
-            endDate: req.query.endDate ? new Date(req.query.endDate as string) : undefined,
+            type: type as string,
+            userGroupName: userGroupName as string,
+            search: search as string,
+            startDate: startDateStr ? new Date(startDateStr as string) : undefined,
+            endDate: endDateStr ? new Date(endDateStr as string) : undefined,
         }
         
         const sort = {
@@ -43,7 +45,8 @@ export class PromotionController {
     // GET /api/promotions/:id
     public static async getPromotionById(req: Request, res: Response): Promise<void> {
         try {
-            const { id } = req.params
+            const { params } = req
+            const { id } = params
             
             const promotion = await PromotionService.getPromotionById(id)
             
@@ -69,7 +72,8 @@ export class PromotionController {
     // POST /api/promotions - Create new promotion
     static async createPromotion(req: Request, res: Response) {
         try {
-            const newPromotion = await PromotionService.createPromotion(req.body)
+            const { body } = req
+            const newPromotion = await PromotionService.createPromotion(body)
             
             emitPromotionEvent('promotion_created', {
                 promotion: newPromotion
@@ -84,8 +88,9 @@ export class PromotionController {
     // PUT /api/promotions/:id - Update promotion
     static async updatePromotion(req: Request, res: Response) {
         try {
+            const { params, body } = req
             
-            const updatedPromotion = await PromotionService.updatePromotion(req.params.id, req.body)
+            const updatedPromotion = await PromotionService.updatePromotion(params.id, body)
 
             emitPromotionEvent('promotion_updated', {
                 promotion: updatedPromotion,
@@ -100,10 +105,11 @@ export class PromotionController {
     // DELETE /api/promotions/:id - Soft delete promotion
     static async deletePromotion(req: Request, res: Response) {
         try {
-            await PromotionService.deletePromotion(req.params.id)
+            const { params } = req
+            await PromotionService.deletePromotion(params.id)
             
             emitPromotionEvent('promotion_deleted', {
-                promotionId: req.params.id
+                promotionId: params.id
             })
             
             res.status(204).send()

@@ -1,2 +1,2 @@
-export * from "./PromotionRepository";
+export * from "./promotionRepository";
 export * from "./types";

@@ -1,1 +1,1 @@
-export * from "./PromotionService";
+export * from "./promotionService";
