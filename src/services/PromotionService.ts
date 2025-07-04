@@ -1,9 +1,10 @@
 import { IPromotion } from "../models"
 import { CreatePromotionData, PromotionFilters, SortOptions, UpdatePromotionData, PromotionRepository } from "../repositories"
+import { DEFAULT_SORT_FIELD, DESC } from "../utils"
 import { PaginatedResponse, PromotionResponse } from "./types"
 
 export class PromotionService {
-  private transformPromotion(promotion: IPromotion): PromotionResponse {
+  private mapPromotion(promotion: IPromotion): PromotionResponse {
     return {
       id: promotion._id.toString(),
       promotionName: promotion.promotionName,
@@ -20,7 +21,7 @@ export class PromotionService {
     }
 
     const promotion = await PromotionRepository.create(data)
-    return this.transformPromotion(promotion)
+    return this.mapPromotion(promotion)
   }
 
   async getPromotionById(id: string): Promise<PromotionResponse | null> {
@@ -28,19 +29,19 @@ export class PromotionService {
     if (!promotion) {
       return null
     }
-    return this.transformPromotion(promotion)
+    return this.mapPromotion(promotion)
   }
 
   async getAllPromotions(
     filters: PromotionFilters = {}, 
     page: number = 1, 
     limit: number = 10,
-    sort: SortOptions = { field: 'createdAt', order: 'desc' }
+    sort: SortOptions = { field: DEFAULT_SORT_FIELD, order: DESC }
   ): Promise<PaginatedResponse<PromotionResponse>> {
     const result = await PromotionRepository.findAll(filters, page, limit, sort)
     
     return {
-      data: result.promotions.map(promotion => this.transformPromotion(promotion)),
+      data: result.promotions.map(promotion => this.mapPromotion(promotion)),
       pagination: {
         total: result.total,
         page: result.page,
@@ -52,7 +53,6 @@ export class PromotionService {
 
   async updatePromotion(id: string, data: UpdatePromotionData): Promise<PromotionResponse | null> {
 
-    // Business logic validation
     if (data.startDate && data.endDate && data.startDate >= data.endDate) {
       throw new Error('End date must be after start date')
     }
@@ -61,7 +61,7 @@ export class PromotionService {
     if (!promotion) {
       return null
     }
-    return this.transformPromotion(promotion)
+    return this.mapPromotion(promotion)
   }
 
   async deletePromotion(id: string): Promise<boolean> {

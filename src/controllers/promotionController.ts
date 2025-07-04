@@ -1,25 +1,29 @@
 import { Request, Response } from 'express'
 import { emitPromotionEvent } from '../index'
 import { PromotionService } from '../services'
+import { ControllerResponse } from './types'
+import { PromotionResponse } from '../services/types'
+import { DEFAULT_SORT_FIELD, DESC } from '../utils'
 
 export class PromotionController {
 
     // GET /api/promotions
-    public static async getAllPromotions(req: Request, res: Response): Promise<void> {
+    public static async getAllPromotions(req: Request, res: Response): Promise<ControllerResponse<PromotionResponse[]>> {
         const { query : {page: pageStr, limit: limitStr, sortBy, sortOrder: sortOrderStr, type, userGroupName, search, startDate: startDateStr, endDate: endDateStr }} = req
         
         const page = parseInt(pageStr as string) || 1
         const limit = parseInt(limitStr as string) || 10
         
-        const sortField = sortBy as string || 'createdAt'
-        const sortOrder = (sortOrderStr as string || 'desc').toLowerCase() as 'asc' | 'desc'
+        const sortField = sortBy as string || DEFAULT_SORT_FIELD
+        const sortOrder = (sortOrderStr as string || DESC).toLowerCase() as 'asc' | 'desc'
         
         if (sortOrder !== 'asc' && sortOrder !== 'desc') {
-            res.status(400).json({
-                success: false,
-                message: 'sortOrder must be either "asc" or "desc"'
-            })
-            return
+            return {
+                statusCode: 400,
+                body: {
+                    message: 'sortOrder must be either "asc" or "desc"'
+                }
+            }
         }
         
         const filters = {
@@ -36,42 +40,33 @@ export class PromotionController {
         }
         
         const result = await PromotionService.getAllPromotions(filters, page, limit, sort)
-        res.json({
-            data: result.data,
-            pagination: result.pagination,
-        })   
+        return {
+            statusCode: 200,
+            body: {
+                data: result.data,
+                pagination: result.pagination,
+            }
+        }
     }
 
     // GET /api/promotions/:id
-    public static async getPromotionById(req: Request, res: Response): Promise<void> {
-        try {
+    public static async getPromotionById(req: Request, res: Response): Promise<ControllerResponse<PromotionResponse>> {
             const { params } = req
             const { id } = params
             
             const promotion = await PromotionService.getPromotionById(id)
             
-            if (!promotion) {
-                res.status(404).json({
-                    success: false,
-                    message: 'Promotion not found'
-                })
-                return
+            return {
+                statusCode: 200,
+                body: {
+                    data: promotion,
+                }
             }
-            
-            res.json({
-                data: promotion,
-            })
-        } catch (error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error retrieving promotion',
-                error: error instanceof Error ? error.message : 'Unknown error'
-            })
-        }
+
     }
+
     // POST /api/promotions - Create new promotion
-    static async createPromotion(req: Request, res: Response) {
-        try {
+    static async createPromotion(req: Request, res: Response): Promise<ControllerResponse<PromotionResponse>> {
             const { body } = req
             const newPromotion = await PromotionService.createPromotion(body)
             
@@ -79,15 +74,17 @@ export class PromotionController {
                 promotion: newPromotion
             })
             
-            res.status(201).json(newPromotion)
-        } catch (error) {
-            res.status(500).json({ error: error.message })
-        }
+            return {
+                statusCode: 201,
+                body: {
+                    data: newPromotion
+                }
+            }
+
     }
 
     // PUT /api/promotions/:id - Update promotion
-    static async updatePromotion(req: Request, res: Response) {
-        try {
+    static async updatePromotion(req: Request, res: Response): Promise<ControllerResponse<PromotionResponse>> {
             const { params, body } = req
             
             const updatedPromotion = await PromotionService.updatePromotion(params.id, body)
@@ -96,15 +93,17 @@ export class PromotionController {
                 promotion: updatedPromotion,
             })
             
-            res.json(updatedPromotion)
-        } catch (error) {
-            res.status(500).json({ error: error.message })
-        }
+            return {
+                statusCode: 200,
+                body: {
+                    data: updatedPromotion
+                }
+            }
+        
     }
 
     // DELETE /api/promotions/:id - Soft delete promotion
-    static async deletePromotion(req: Request, res: Response) {
-        try {
+    static async deletePromotion(req: Request, res: Response): Promise<ControllerResponse<void>> {
             const { params } = req
             await PromotionService.deletePromotion(params.id)
             
@@ -112,9 +111,10 @@ export class PromotionController {
                 promotionId: params.id
             })
             
-            res.status(204).send()
-        } catch (error) {
-            res.status(500).json({ error: error.message })
-        }
+            return {
+                statusCode: 204,
+                body: {}
+            }
+        
     }
 }

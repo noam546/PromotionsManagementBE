@@ -18,4 +18,4 @@ router.put('/:id', PromotionController.updatePromotion)
 // DELETE /api/promotions/:id - Delete promotion
 router.delete('/:id', PromotionController.deletePromotion)
 
-export default router
+export { router as PromotionRoutes }

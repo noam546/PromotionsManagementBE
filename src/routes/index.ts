@@ -1,1 +1,1 @@
-export {default as PromotionRoutes} from "./promotionRoutes";
+export { PromotionRoutes } from "./promotionRoutes";
