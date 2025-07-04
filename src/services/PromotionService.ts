@@ -2,6 +2,7 @@ import { IPromotion } from "../models"
 import { CreatePromotionData, PromotionFilters, SortOptions, UpdatePromotionData, PromotionRepository } from "../repositories"
 import { DEFAULT_SORT_FIELD, DESC } from "../utils"
 import { PaginatedResponse, PromotionResponse } from "./types"
+import { ValidationException, NotFoundException } from "../exceptions"
 
 export class PromotionService {
   private mapPromotion(promotion: IPromotion): PromotionResponse {
@@ -17,17 +18,20 @@ export class PromotionService {
 
   async createPromotion(data: CreatePromotionData): Promise<PromotionResponse> {
     if (data.startDate >= data.endDate) {
-      throw new Error('End date must be after start date')
+      throw ValidationException.invalidDateRange(
+        data.startDate.toISOString(), 
+        data.endDate.toISOString()
+      )
     }
 
     const promotion = await PromotionRepository.create(data)
     return this.mapPromotion(promotion)
   }
 
-  async getPromotionById(id: string): Promise<PromotionResponse | null> {
+  async getPromotionById(id: string): Promise<PromotionResponse> {
     const promotion = await PromotionRepository.findById(id)
     if (!promotion) {
-      return null
+      throw NotFoundException.promotionNotFound(id)
     }
     return this.mapPromotion(promotion)
   }
@@ -51,21 +55,28 @@ export class PromotionService {
     }
   }
 
-  async updatePromotion(id: string, data: UpdatePromotionData): Promise<PromotionResponse | null> {
+  async updatePromotion(id: string, data: UpdatePromotionData): Promise<PromotionResponse> {
 
     if (data.startDate && data.endDate && data.startDate >= data.endDate) {
-      throw new Error('End date must be after start date')
+      throw ValidationException.invalidDateRange(
+        data.startDate.toISOString(), 
+        data.endDate.toISOString()
+      )
     }
 
     const promotion = await PromotionRepository.update(id, data)
     if (!promotion) {
-      return null
+      throw NotFoundException.promotionNotFound(id)
     }
     return this.mapPromotion(promotion)
   }
 
   async deletePromotion(id: string): Promise<boolean> {
-    return await PromotionRepository.delete(id)
+    const deleted = await PromotionRepository.delete(id)
+    if (!deleted) {
+      throw NotFoundException.promotionNotFound(id)
+    }
+    return deleted
   }
 }
 

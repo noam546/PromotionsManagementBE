@@ -1,1 +1,1 @@
-export {default as PromotionService } from "./PromotionService";
+export {default as PromotionService } from "./promotionService";

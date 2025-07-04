@@ -4,6 +4,7 @@ import { PromotionService } from '../services'
 import { ControllerResponse } from './types'
 import { PromotionResponse } from '../services/types'
 import { DEFAULT_SORT_FIELD, DESC } from '../utils'
+import { ValidationException } from '../exceptions'
 
 export class PromotionController {
 
@@ -14,16 +15,15 @@ export class PromotionController {
         const page = parseInt(pageStr as string) || 1
         const limit = parseInt(limitStr as string) || 10
         
+        if (page < 1 || limit < 1) {
+            throw ValidationException.invalidPagination(page, limit)
+        }
+        
         const sortField = sortBy as string || DEFAULT_SORT_FIELD
         const sortOrder = (sortOrderStr as string || DESC).toLowerCase() as 'asc' | 'desc'
         
         if (sortOrder !== 'asc' && sortOrder !== 'desc') {
-            return {
-                statusCode: 400,
-                body: {
-                    message: 'sortOrder must be either "asc" or "desc"'
-                }
-            }
+            throw ValidationException.invalidSortOrder(sortOrder)
         }
         
         const filters = {
@@ -62,7 +62,6 @@ export class PromotionController {
                     data: promotion,
                 }
             }
-
     }
 
     // POST /api/promotions - Create new promotion
@@ -99,7 +98,6 @@ export class PromotionController {
                     data: updatedPromotion
                 }
             }
-        
     }
 
     // DELETE /api/promotions/:id - Soft delete promotion
@@ -115,6 +113,5 @@ export class PromotionController {
                 statusCode: 204,
                 body: {}
             }
-        
     }
 }
