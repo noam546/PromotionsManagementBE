@@ -1,34 +1,6 @@
-import { IPromotion } from '../models/Promotion'
-import Promotion from '../models/Promotion'
-
-export interface CreatePromotionData {
-  promotionName: string
-  userGroupName: string
-  type: 'event' | 'sale' | 'bonus'
-  startDate: Date
-  endDate: Date
-}
-
-export interface UpdatePromotionData {
-  promotionName?: string
-  userGroupName?: string
-  type?: 'event' | 'sale' | 'bonus'
-  startDate?: Date
-  endDate?: Date
-}
-
-export interface PromotionFilters {
-  type?: string
-  userGroupName?: string
-  startDate?: Date
-  endDate?: Date
-  search?: string
-}
-
-export interface SortOptions {
-  field: string
-  order: 'asc' | 'desc'
-}
+import { IPromotion } from "../models"
+import Promotion from "../models/Promotion"
+import { CreatePromotionData, UpdatePromotionData, PromotionFilters, SortOptions } from "./types"
 
 export class PromotionRepository {
   async create(data: CreatePromotionData): Promise<IPromotion> {

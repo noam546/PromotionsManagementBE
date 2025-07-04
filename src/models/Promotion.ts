@@ -1,9 +1,10 @@
 import mongoose, { Document, Schema } from 'mongoose'
+import { PromotionType } from '../repositories'
 
 export interface IPromotion extends Document {
   promotionName: string
   userGroupName: string
-  type: 'basic' | 'epic' | 'common'
+  type: PromotionType
   startDate: Date
   endDate: Date
 }

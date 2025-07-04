@@ -1,29 +1,7 @@
-import { IPromotion } from '../models/Promotion'
-import promotionRepository, { 
-  CreatePromotionData, 
-  UpdatePromotionData, 
-  PromotionFilters,
-  SortOptions
-} from '../repositories/PromotionRepository'
-
-export interface PromotionResponse {
-  id: string
-  promotionName: string
-  userGroupName: string
-  type: string
-  startDate: Date
-  endDate: Date
-}
-
-export interface PaginatedResponse<T> {
-  data: T[]
-  pagination: {
-    total: number
-    page: number
-    totalPages: number
-    limit: number
-  }
-}
+import { IPromotion } from "../models"
+import { CreatePromotionData, PromotionFilters, SortOptions, UpdatePromotionData } from "../repositories"
+import PromotionRepository from "../repositories/PromotionRepository"
+import { PaginatedResponse, PromotionResponse } from "./types"
 
 export class PromotionService {
   private transformPromotion(promotion: IPromotion): PromotionResponse {
@@ -42,12 +20,12 @@ export class PromotionService {
       throw new Error('End date must be after start date')
     }
 
-    const promotion = await promotionRepository.create(data)
+    const promotion = await PromotionRepository.create(data)
     return this.transformPromotion(promotion)
   }
 
   async getPromotionById(id: string): Promise<PromotionResponse | null> {
-    const promotion = await promotionRepository.findById(id)
+    const promotion = await PromotionRepository.findById(id)
     if (!promotion) {
       return null
     }
@@ -60,7 +38,7 @@ export class PromotionService {
     limit: number = 10,
     sort: SortOptions = { field: 'createdAt', order: 'desc' }
   ): Promise<PaginatedResponse<PromotionResponse>> {
-    const result = await promotionRepository.findAll(filters, page, limit, sort)
+    const result = await PromotionRepository.findAll(filters, page, limit, sort)
     
     return {
       data: result.promotions.map(promotion => this.transformPromotion(promotion)),
@@ -80,7 +58,7 @@ export class PromotionService {
       throw new Error('End date must be after start date')
     }
 
-    const promotion = await promotionRepository.update(id, data)
+    const promotion = await PromotionRepository.update(id, data)
     if (!promotion) {
       return null
     }
@@ -88,7 +66,7 @@ export class PromotionService {
   }
 
   async deletePromotion(id: string): Promise<boolean> {
-    return await promotionRepository.delete(id)
+    return await PromotionRepository.delete(id)
   }
 }
 
