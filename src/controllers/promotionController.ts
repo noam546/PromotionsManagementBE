@@ -1,7 +1,14 @@
-import { Request, Response } from 'express'
+import { Response } from 'express'
 import { emitPromotionEvent } from '../index'
 import { PromotionService } from '../services'
-import { ControllerResponse } from './types'
+import { 
+    ControllerResponse, 
+    GetAllPromotionsRequest, 
+    GetPromotionByIdRequest, 
+    CreatePromotionRequest, 
+    UpdatePromotionRequest, 
+    DeletePromotionRequest 
+} from './types'
 import { PromotionResponse } from '../services/types'
 import { DEFAULT_SORT_FIELD, DESC } from '../utils'
 import { ValidationException } from '../exceptions'
@@ -9,29 +16,29 @@ import { ValidationException } from '../exceptions'
 export class PromotionController {
 
     // GET /api/promotions
-    public static async getAllPromotions(req: Request, res: Response): Promise<ControllerResponse<PromotionResponse[]>> {
-        const { query : {page: pageStr, limit: limitStr, sortBy, sortOrder: sortOrderStr, type, userGroupName, search, startDate: startDateStr, endDate: endDateStr }} = req
+    public static async getAllPromotions(req: GetAllPromotionsRequest, res: Response): Promise<ControllerResponse<PromotionResponse[]>> {
+        const { query: { page: pageStr, limit: limitStr, sortBy, sortOrder: sortOrderStr, type, userGroupName, search, startDate: startDateStr, endDate: endDateStr } } = req
         
-        const page = parseInt(pageStr as string) || 1
-        const limit = parseInt(limitStr as string) || 10
+        const page = parseInt(pageStr || '1')
+        const limit = parseInt(limitStr || '10')
         
         if (page < 1 || limit < 1) {
             throw ValidationException.invalidPagination({ page, limit })
         }
         
-        const sortField = sortBy as string || DEFAULT_SORT_FIELD
-        const sortOrder = (sortOrderStr as string || DESC).toLowerCase() as 'asc' | 'desc'
+        const sortField = sortBy || DEFAULT_SORT_FIELD
+        const sortOrder = (sortOrderStr || DESC).toLowerCase() as 'asc' | 'desc'
         
         if (sortOrder !== 'asc' && sortOrder !== 'desc') {
-            throw ValidationException.invalidSortOrder({ sortOrder: sortOrder as string })
+            throw ValidationException.invalidSortOrder({ sortOrder })
         }
         
         const filters = {
-            type: type as string,
-            userGroupName: userGroupName as string,
-            search: search as string,
-            startDate: startDateStr ? new Date(startDateStr as string) : undefined,
-            endDate: endDateStr ? new Date(endDateStr as string) : undefined,
+            type,
+            userGroupName,
+            search,
+            startDate: startDateStr ? new Date(startDateStr) : undefined,
+            endDate: endDateStr ? new Date(endDateStr) : undefined,
         }
         
         const sort = {
@@ -50,7 +57,7 @@ export class PromotionController {
     }
 
     // GET /api/promotions/:id
-    public static async getPromotionById(req: Request, res: Response): Promise<ControllerResponse<PromotionResponse>> {
+    public static async getPromotionById(req: GetPromotionByIdRequest, res: Response): Promise<ControllerResponse<PromotionResponse>> {
             const { params } = req
             const { id } = params
             
@@ -65,7 +72,7 @@ export class PromotionController {
     }
 
     // POST /api/promotions - Create new promotion
-    static async createPromotion(req: Request, res: Response): Promise<ControllerResponse<PromotionResponse>> {
+    static async createPromotion(req: CreatePromotionRequest, res: Response): Promise<ControllerResponse<PromotionResponse>> {
             const { body } = req
             const newPromotion = await PromotionService.createPromotion(body)
             
@@ -83,7 +90,7 @@ export class PromotionController {
     }
 
     // PUT /api/promotions/:id - Update promotion
-    static async updatePromotion(req: Request, res: Response): Promise<ControllerResponse<PromotionResponse>> {
+    static async updatePromotion(req: UpdatePromotionRequest, res: Response): Promise<ControllerResponse<PromotionResponse>> {
             const { params, body } = req
             
             const updatedPromotion = await PromotionService.updatePromotion(params.id, body)
@@ -101,7 +108,7 @@ export class PromotionController {
     }
 
     // DELETE /api/promotions/:id - Soft delete promotion
-    static async deletePromotion(req: Request, res: Response): Promise<ControllerResponse<void>> {
+    static async deletePromotion(req: DeletePromotionRequest, res: Response): Promise<ControllerResponse<void>> {
             const { params } = req
             await PromotionService.deletePromotion(params.id)
             
