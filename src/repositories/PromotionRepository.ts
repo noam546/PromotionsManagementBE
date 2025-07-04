@@ -1,5 +1,4 @@
-import { IPromotion } from "../models"
-import Promotion from "../models/promotion"
+import { IPromotion, Promotion } from "../models"
 import { DEFAULT_LIMIT, DEFAULT_PAGE, DEFAULT_SORT_FIELD, DEFAULT_SORT_ORDER } from "../utils"
 import { CreatePromotionData, UpdatePromotionData, PromotionFilters, SortOptions } from "./types"
 

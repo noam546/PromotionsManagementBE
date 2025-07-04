@@ -1,10 +1,10 @@
 import * as express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
-import promotionRoutes from './routes/promotionRoutes'
-import { errorHandler, notFound } from './middleware/errorHandler'
+import {PromotionRoutes} from './routes'
+import { errorHandler, notFound } from './middleware'
 import config from './config'
-import databaseConnection from './database/connection'
+import {DatabaseConnection} from './database'
 const cors = require('cors')
 
 const app: express.Application = express()
@@ -33,12 +33,12 @@ app.get('/health', (req: express.Request, res: express.Response) => {
     res.json({ 
         status: 'OK', 
         timestamp: new Date().toISOString(),
-        database: databaseConnection.getConnectionStatus() ? 'connected' : 'disconnected',
+        database: DatabaseConnection.getConnectionStatus() ? 'connected' : 'disconnected',
         websocket: 'enabled'
     })
 })
 
-app.use('/api/promotions', promotionRoutes)
+app.use('/api/promotions', PromotionRoutes)
 
 app.use(notFound)
 app.use(errorHandler)
@@ -73,7 +73,7 @@ async function startServer() {
     try {
 
         
-        await databaseConnection.connect()
+        await DatabaseConnection.connect()
         
         server.listen(config.port, () => {
             console.log(`Server is Running at http://localhost:${config.port}`)
@@ -81,7 +81,7 @@ async function startServer() {
 
         process.on('SIGTERM', async () => {
             server.close(async () => {
-                await databaseConnection.disconnect()
+                await DatabaseConnection.disconnect()
                 console.log('Server closed')
                 process.exit(0)
             })
@@ -89,7 +89,7 @@ async function startServer() {
 
         process.on('SIGINT', async () => {
             server.close(async () => {
-                await databaseConnection.disconnect()
+                await DatabaseConnection.disconnect()
                 console.log('Server closed')
                 process.exit(0)
             })

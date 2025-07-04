@@ -1,6 +1,5 @@
 import { IPromotion } from "../models"
-import { CreatePromotionData, PromotionFilters, SortOptions, UpdatePromotionData } from "../repositories"
-import PromotionRepository from "../repositories/promotionRepository"
+import { CreatePromotionData, PromotionFilters, SortOptions, UpdatePromotionData, PromotionRepository } from "../repositories"
 import { PaginatedResponse, PromotionResponse } from "./types"
 
 export class PromotionService {

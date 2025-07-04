@@ -1,1 +1,1 @@
-export * from "./connection";
+export {default as DatabaseConnection} from "./connection";

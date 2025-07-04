@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { emitPromotionEvent } from '../index' // Import the helper function
-import PromotionService from '../services/promotionService'
+import { emitPromotionEvent } from '../index'
+import { PromotionService } from '../services'
 
 export class PromotionController {
 
