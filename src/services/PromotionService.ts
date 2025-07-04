@@ -18,10 +18,10 @@ export class PromotionService {
 
   async createPromotion(data: CreatePromotionData): Promise<PromotionResponse> {
     if (data.startDate >= data.endDate) {
-      throw ValidationException.invalidDateRange(
-        data.startDate.toISOString(), 
-        data.endDate.toISOString()
-      )
+      throw ValidationException.invalidDateRange({
+        startDate: data.startDate.toISOString(),
+        endDate: data.endDate.toISOString()
+      })
     }
 
     const promotion = await PromotionRepository.create(data)
@@ -31,7 +31,7 @@ export class PromotionService {
   async getPromotionById(id: string): Promise<PromotionResponse> {
     const promotion = await PromotionRepository.findById(id)
     if (!promotion) {
-      throw NotFoundException.promotionNotFound(id)
+      throw NotFoundException.promotionNotFound({ id })
     }
     return this.mapPromotion(promotion)
   }
@@ -58,15 +58,15 @@ export class PromotionService {
   async updatePromotion(id: string, data: UpdatePromotionData): Promise<PromotionResponse> {
 
     if (data.startDate && data.endDate && data.startDate >= data.endDate) {
-      throw ValidationException.invalidDateRange(
-        data.startDate.toISOString(), 
-        data.endDate.toISOString()
-      )
+      throw ValidationException.invalidDateRange({
+        startDate: data.startDate.toISOString(),
+        endDate: data.endDate.toISOString()
+      })
     }
 
     const promotion = await PromotionRepository.update(id, data)
     if (!promotion) {
-      throw NotFoundException.promotionNotFound(id)
+      throw NotFoundException.promotionNotFound({ id })
     }
     return this.mapPromotion(promotion)
   }
@@ -74,7 +74,7 @@ export class PromotionService {
   async deletePromotion(id: string): Promise<boolean> {
     const deleted = await PromotionRepository.delete(id)
     if (!deleted) {
-      throw NotFoundException.promotionNotFound(id)
+      throw NotFoundException.promotionNotFound({ id })
     }
     return deleted
   }

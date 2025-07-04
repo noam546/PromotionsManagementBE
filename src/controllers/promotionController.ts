@@ -16,14 +16,14 @@ export class PromotionController {
         const limit = parseInt(limitStr as string) || 10
         
         if (page < 1 || limit < 1) {
-            throw ValidationException.invalidPagination(page, limit)
+            throw ValidationException.invalidPagination({ page, limit })
         }
         
         const sortField = sortBy as string || DEFAULT_SORT_FIELD
         const sortOrder = (sortOrderStr as string || DESC).toLowerCase() as 'asc' | 'desc'
         
         if (sortOrder !== 'asc' && sortOrder !== 'desc') {
-            throw ValidationException.invalidSortOrder(sortOrder)
+            throw ValidationException.invalidSortOrder({ sortOrder: sortOrder as string })
         }
         
         const filters = {

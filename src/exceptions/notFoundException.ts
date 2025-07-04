@@ -1,15 +1,25 @@
 import { BaseException } from './baseException'
 
+export interface NotFoundErrorDetails {
+  resourceType?: string
+  message?: string
+  [key: string]: any 
+}
+
 export class NotFoundException extends BaseException {
-  constructor(message: string) {
+  public readonly details: NotFoundErrorDetails
+
+  constructor(message: string, details: NotFoundErrorDetails = {}) {
     super(message, 404)
+    this.details = details
   }
 
-  static promotionNotFound(id: string): NotFoundException {
-    return new NotFoundException(`Promotion with id "${id}" not found`)
+  static promotionNotFound(details: { id: string }): NotFoundException {
+    return new NotFoundException(
+      'Promotion not found',
+      { ...details, resourceType: 'promotion' }
+    )
   }
 
-  static resourceNotFound(resourceType: string, identifier: string): NotFoundException {
-    return new NotFoundException(`${resourceType} with identifier "${identifier}" not found`)
-  }
+
 } 

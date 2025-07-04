@@ -2,7 +2,7 @@ import * as express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import {PromotionRoutes} from './routes'
-import { errorHandler, notFound } from './middleware'
+import { errorHandler } from './middleware'
 import config from './config'
 import {DatabaseConnection} from './database'
 const cors = require('cors')
@@ -40,7 +40,6 @@ app.get('/health', (req: express.Request, res: express.Response) => {
 
 app.use('/api/promotions', PromotionRoutes)
 
-app.use(notFound)
 app.use(errorHandler)
 
 // WebSocket connection handling

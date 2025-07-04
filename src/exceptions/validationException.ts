@@ -1,20 +1,37 @@
 import { BaseException } from './baseException'
 
+export interface ValidationErrorDetails {
+  resourceType?: string
+  [key: string]: any
+}
+
 export class ValidationException extends BaseException {
-  constructor(message: string) {
+  public readonly details: ValidationErrorDetails
+
+  constructor(message: string, details: ValidationErrorDetails = {}) {
     super(message, 400)
+    this.details = details
   }
 
-  static invalidDateRange(startDate: string, endDate: string): ValidationException {
-    return new ValidationException(`End date (${endDate}) must be after start date (${startDate})`)
+  static invalidDateRange(details: { startDate: string; endDate: string; resourceType?: string }): ValidationException {
+    return new ValidationException(
+      'End date must be after start date',
+      details
+    )
   }
 
-  static invalidSortOrder(sortOrder: string): ValidationException {
-    return new ValidationException(`Sort order must be either "asc" or "desc", received: ${sortOrder}`)
+  static invalidSortOrder(details: { sortOrder: string; resourceType?: string }): ValidationException {
+    return new ValidationException(
+      'Sort order must be either "asc" or "desc"',
+      details
+    )
   }
 
-  static invalidPagination(page: number, limit: number): ValidationException {
-    return new ValidationException(`Invalid pagination parameters: page=${page}, limit=${limit}. Both must be positive numbers.`)
+  static invalidPagination(details: { page: number; limit: number; resourceType?: string }): ValidationException {
+    return new ValidationException(
+      'Invalid pagination parameters. Both page and limit must be positive numbers.',
+      details
+    )
   }
 
 } 

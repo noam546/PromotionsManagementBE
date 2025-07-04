@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import config from '../config'
 import { CustomError } from './types'
-import { NotFoundException, BaseException } from '../exceptions'
+import { BaseException } from '../exceptions'
 
 export const errorHandler = (
     err: Error | BaseException | CustomError,
@@ -11,10 +11,16 @@ export const errorHandler = (
 ): void => {
     let statusCode = 500
     let message = 'Internal Server Error'
+    let details: any = undefined
 
     if (err instanceof BaseException) {
         statusCode = err.statusCode
         message = err.message
+        
+        // Include details if available
+        if ('details' in err && err.details) {
+            details = err.details
+        }
     } else if ('statusCode' in err && err.statusCode) {
         statusCode = err.statusCode
         message = err.message || 'Internal Server Error'
@@ -22,14 +28,18 @@ export const errorHandler = (
         message = err.message || 'Internal Server Error'
     }
 
-    res.status(statusCode).json({
+    const response: any = {
         success: false,
         message,
-        ...(config.nodeEnv === 'development' && { stack: err.stack })
-    })
-}
+    }
 
-export const notFound = (req: Request, res: Response, next: NextFunction): void => {
-    const error = NotFoundException.resourceNotFound('route', req.originalUrl)
-    next(error)
+    if (details) {
+        response.details = details
+    }
+
+    if (config.nodeEnv === 'development') {
+        response.stack = err.stack
+    }
+
+    res.status(statusCode).json(response)
 }
