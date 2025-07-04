@@ -27,5 +27,7 @@ export interface PromotionFilters {
 
 export interface SortOptions {
   field: string
-  order: 'asc' | 'desc'
-} 
+  order: SortOrder
+}    
+
+export type SortOrder = 'asc' | 'desc'

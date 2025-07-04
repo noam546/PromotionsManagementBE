@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { PromotionResponse } from '../services'
+import { SortOrder } from '../repositories'
 
 export interface ApiResponse<T = any> {
     data?: T
@@ -23,7 +24,7 @@ export interface GetAllPromotionsQuery {
     page?: string
     limit?: string
     sortBy?: string
-    sortOrder?: string
+    sortOrder?: SortOrder
     type?: string
     userGroupName?: string
     search?: string

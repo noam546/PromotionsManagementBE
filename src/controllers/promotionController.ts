@@ -30,7 +30,7 @@ export class PromotionController {
         }
         
         const sortField = sortBy || DEFAULT_SORT_FIELD
-        const sortOrder = (sortOrderStr || DESC).toLowerCase() as 'asc' | 'desc'
+        const sortOrder = sortOrderStr || DESC
         
         if (sortOrder !== 'asc' && sortOrder !== 'desc') {
             throw ValidationException.invalidSortOrder({ sortOrder })
