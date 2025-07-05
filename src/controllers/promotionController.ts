@@ -7,11 +7,6 @@ import {
     CreatePromotionRequest, 
     UpdatePromotionRequest, 
     DeletePromotionRequest,
-    GetAllPromotionsResponse,
-    GetPromotionByIdResponse,
-    CreatePromotionResponse,
-    UpdatePromotionResponse,
-    DeletePromotionResponse
 } from './types'
 import { DEFAULT_SORT_FIELD, DESC } from '../utils'
 import { ValidationException } from '../exceptions'
@@ -19,7 +14,7 @@ import { ValidationException } from '../exceptions'
 export class PromotionController {
 
     // GET /api/promotions
-    public static async getAllPromotions(req: GetAllPromotionsRequest, res: any): Promise<void> {
+    public static async getAllPromotions(req: GetAllPromotionsRequest, res: any): Promise<ControllerResponse<PromotionResponse[]>> {
         const { query: { page: pageStr, limit: limitStr, sortBy, sortOrder: sortOrderStr, type, userGroupName, search, startDate: startDateStr, endDate: endDateStr } } = req
         
         const page = parseInt(pageStr || '1')
@@ -50,32 +45,36 @@ export class PromotionController {
         }
         
         const result = await PromotionService.getAllPromotions(filters, page, limit, sort)
-        res.json({
+        const response: ControllerResponse<PromotionResponse[]> = {
             statusCode: 200,
             body: {
                 data: result.data,
                 pagination: result.pagination,
             }
-        })
+        }
+        res.json(response)
+        return response
     }
 
     // GET /api/promotions/:id
-    public static async getPromotionById(req: GetPromotionByIdRequest, res: any): Promise<void> {
+    public static async getPromotionById(req: GetPromotionByIdRequest, res: any): Promise<ControllerResponse<PromotionResponse>> {
             const { params } = req
             const { id } = params
             
             const promotion = await PromotionService.getPromotionById(id)
             
-            res.json({
+            const response: ControllerResponse<PromotionResponse> = {
                 statusCode: 200,
                 body: {
                     data: promotion,
                 }
-            })
+            }
+            res.json(response)
+            return response
     }
 
     // POST /api/promotions - Create new promotion
-    static async createPromotion(req: CreatePromotionRequest, res: any): Promise<void> {
+    static async createPromotion(req: CreatePromotionRequest, res: any): Promise<ControllerResponse<PromotionResponse>> {
             const { body } = req
             const newPromotion = await PromotionService.createPromotion(body)
             
@@ -83,17 +82,19 @@ export class PromotionController {
                 promotion: newPromotion
             })
             
-            res.json({
+            const response: ControllerResponse<PromotionResponse> = {
                 statusCode: 201,
                 body: {
                     data: newPromotion
                 }
-            })
+            }
+            res.json(response)
+            return response
 
     }
 
     // PUT /api/promotions/:id - Update promotion
-    static async updatePromotion(req: UpdatePromotionRequest, res: any): Promise<void> {
+    static async updatePromotion(req: UpdatePromotionRequest, res: any): Promise<ControllerResponse<PromotionResponse>> {
             const { params, body } = req
             
             const updatedPromotion = await PromotionService.updatePromotion(params.id, body)
@@ -102,16 +103,18 @@ export class PromotionController {
                 promotion: updatedPromotion,
             })
             
-            res.json({
+            const response: ControllerResponse<PromotionResponse> = {
                 statusCode: 200,
                 body: {
                     data: updatedPromotion
                 }
-            })
+            }
+            res.json(response)
+            return response
     }
 
     // DELETE /api/promotions/:id - Soft delete promotion
-    static async deletePromotion(req: DeletePromotionRequest, res: any): Promise<void> {
+    static async deletePromotion(req: DeletePromotionRequest, res: any): Promise<ControllerResponse<void>> {
             const { params } = req
             await PromotionService.deletePromotion(params.id)
             
@@ -119,9 +122,11 @@ export class PromotionController {
                 promotionId: params.id
             })
             
-            res.json({
+            const response: ControllerResponse<void> = {
                 statusCode: 204,
                 body: {}
-            })
+            }
+            res.json(response)
+            return response
     }
 }

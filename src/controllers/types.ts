@@ -55,10 +55,3 @@ export type UpdatePromotionRequest = Request<UpdatePromotionParams, {}, any>
 export type DeletePromotionRequest = Request<DeletePromotionParams>
 export type CreatePromotionRequest = Request<{}, {}, any>
 
-// Typed response types
-export type GetAllPromotionsResponse = Response<ApiResponse<PromotionResponse[]>>
-export type GetPromotionByIdResponse = Response<ApiResponse<PromotionResponse>>
-export type CreatePromotionResponse = Response<ApiResponse<PromotionResponse>>
-export type UpdatePromotionResponse = Response<ApiResponse<PromotionResponse>>
-export type DeletePromotionResponse = Response<ApiResponse<void>>
-
