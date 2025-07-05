@@ -2,7 +2,7 @@ import * as express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import {PromotionRoutes} from './routes'
-import { errorHandler } from './middleware'
+import { errorHandler, responseHandler } from './middleware'
 import config from './config'
 import {DatabaseConnection} from './database'
 const cors = require('cors')
@@ -24,6 +24,7 @@ app.use(cors({
 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(responseHandler)
 
 app.get('/', (req: express.Request, res: express.Response) => {
     res.send('Welcome to Express & TypeScript Server')
