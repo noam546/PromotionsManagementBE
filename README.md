@@ -2,7 +2,7 @@
 
 A Node.js/TypeScript backend API for managing promotions with MongoDB integration, featuring a clean layered architecture with services and repositories. Includes WebSocket support for real-time updates and comprehensive error handling.
 
-## 🏗️ Architecture
+## Architecture
 
 This project follows a clean layered architecture:
 
@@ -11,6 +11,7 @@ src/
 ├── config/           # Configuration management
 ├── controllers/      # HTTP request handlers
 ├── database/         # Database connection management
+├── exceptions/       # Custom exception classes
 ├── middleware/       # Express middleware
 ├── models/          # Mongoose schemas and models
 ├── repositories/    # Data access layer
@@ -24,8 +25,9 @@ src/
 - **Services**: Business logic and data transformation
 - **Repositories**: Database operations and data access
 - **Models**: Data schemas and validation
+- **Middleware**: Request/response processing and error handling
 
-## 🚀 Quick Start
+## Quick Start
 
 1. **Install dependencies**:
    ```bash
@@ -45,7 +47,7 @@ src/
    yarn start
    ```
 
-## 📊 Database Setup
+## Database Setup
 
 The application uses MongoDB with Mongoose ODM. Make sure MongoDB is running:
 
@@ -56,7 +58,7 @@ mongod
 # Or use MongoDB Atlas (update DATABASE_URL in .env)
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -80,7 +82,7 @@ The configuration is centralized in `src/config/index.ts` and provides:
 - Support for both `.env` and `.env.local` files
 - Environment-specific settings
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### Promotions Management
 
@@ -104,13 +106,7 @@ The configuration is centralized in `src/config/index.ts` and provides:
 - `startDate`: Filter by start date
 - `endDate`: Filter by end date
 
-### Health Check
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/health` | Health check with database and WebSocket status |
-
-## 🎯 Promotion Types
+## Promotion Types
 
 The system supports three types of promotions:
 
@@ -118,7 +114,7 @@ The system supports three types of promotions:
 2. **Epic**: Epic and premium promotions
 3. **Common**: Common and standard promotions
 
-## 📝 Data Models
+## Data Models
 
 ### Promotion Schema
 
@@ -129,59 +125,10 @@ interface IPromotion {
   type: 'basic' | 'epic' | 'common' // Promotion type (required)
   startDate: Date              // Start date (required)
   endDate: Date                // End date (required)
-  createdAt: Date              // Auto-generated timestamp
-  updatedAt: Date              // Auto-generated timestamp
 }
 ```
 
-## 🔄 Business Logic
-
-### Promotion Validation
-- End date must be after start date (enforced at schema level)
-- Type must be one of: basic, epic, common
-- Promotion name and user group name are required and trimmed
-- Maximum length validation for text fields
-
-### Database Indexes
-- Compound index on type, userGroupName, and createdAt
-- Text index on promotionName and userGroupName for search
-- Indexes on startDate and endDate for date filtering
-
-## 🔌 WebSocket Support
-
-The application includes WebSocket support for real-time updates:
-
-- **Connection**: Clients can connect to the WebSocket server
-- **Rooms**: Clients can join/leave the 'promotions' room
-- **Events**: Real-time notifications for promotion changes:
-  - `promotion_created`: When a new promotion is created
-  - `promotion_updated`: When a promotion is updated
-  - `promotion_deleted`: When a promotion is deleted
-
-### WebSocket Events
-
-```javascript
-// Join promotions room
-socket.emit('join_promotions_room')
-
-// Leave promotions room
-socket.emit('leave_promotions_room')
-
-// Listen for promotion events
-socket.on('promotion_created', (data) => {
-  console.log('New promotion:', data.promotion)
-})
-
-socket.on('promotion_updated', (data) => {
-  console.log('Updated promotion:', data.promotion)
-})
-
-socket.on('promotion_deleted', (data) => {
-  console.log('Deleted promotion ID:', data.promotionId)
-})
-```
-
-## 🛠️ Development
+## Development
 
 ### Scripts
 
@@ -191,7 +138,6 @@ socket.on('promotion_deleted', (data) => {
 - `yarn dev`: Development mode with hot reload
 - `yarn check-schema`: Check database schema
 - `yarn migrate-schema`: Run schema migrations
-- `yarn remove-extra-fields`: Remove extra fields from documents
 
 ### Adding New Features
 
@@ -200,26 +146,11 @@ socket.on('promotion_deleted', (data) => {
 3. **Services**: Implement business logic in `src/services/`
 4. **Controllers**: Handle HTTP requests in `src/controllers/`
 5. **Routes**: Define API endpoints in `src/routes/`
+6. **Middleware**: Add custom middleware in `src/middleware/`
+7. **Exceptions**: Create custom exceptions in `src/exceptions/`
 
-## 🧪 Testing
 
-The application includes comprehensive error handling and validation:
-
-- Input validation in controllers
-- Business logic validation in services
-- Database validation in models
-- Error handling middleware
-- Graceful error responses
-
-## 🔒 Security
-
-- Environment variables for sensitive data
-- Input validation and sanitization
-- Error handling without exposing internals
-- CORS configuration for cross-origin requests
-- Graceful shutdown handling
-
-## 📦 Dependencies
+## Dependencies
 
 ### Production Dependencies
 - `express`: Web framework
@@ -228,44 +159,3 @@ The application includes comprehensive error handling and validation:
 - `cors`: Cross-origin resource sharing
 - `dotenv`: Environment variable management
 - `typescript`: TypeScript support
-
-### Development Dependencies
-- `@types/express`: Express type definitions
-- `@types/mongoose`: Mongoose type definitions
-- `@types/cors`: CORS type definitions
-- `@types/socket.io`: Socket.io type definitions
-- `nodemon`: Development server with auto-restart
-- `ts-node`: TypeScript execution for scripts
-
-## 📈 Monitoring
-
-The application includes health monitoring:
-
-- Database connection status
-- WebSocket server status
-- Server uptime and timestamp
-- Graceful shutdown handling
-
-## 🚀 Deployment
-
-1. Build the application:
-   ```bash
-   yarn build
-   ```
-
-2. Set production environment variables:
-   ```bash
-   NODE_ENV=production
-   PORT=8000
-   DATABASE_URL=your_mongodb_url
-   REACT_APP_URL=your_frontend_url
-   ```
-
-3. Start the production server:
-   ```bash
-   node dist/index.js
-   ```
-
-## 📄 License
-
-ISC License
