@@ -98,7 +98,7 @@ The configuration is centralized in `src/config/index.ts` and provides:
 - `limit`: Number of items per page (default: 10)
 - `sortBy`: Field to sort by (default: 'createdAt')
 - `sortOrder`: Sort order - 'asc' or 'desc' (default: 'desc')
-- `type`: Filter by promotion type (event, sale, bonus)
+- `type`: Filter by promotion type (basic, epic, common)
 - `userGroupName`: Filter by user group name
 - `search`: Search in promotionName and userGroupName
 - `startDate`: Filter by start date
@@ -114,9 +114,9 @@ The configuration is centralized in `src/config/index.ts` and provides:
 
 The system supports three types of promotions:
 
-1. **Event**: Special events and campaigns
-2. **Sale**: Sales and discount promotions
-3. **Bonus**: Bonus and reward promotions
+1. **Basic**: Basic promotions and offers
+2. **Epic**: Epic and premium promotions
+3. **Common**: Common and standard promotions
 
 ## 📝 Data Models
 
@@ -126,7 +126,7 @@ The system supports three types of promotions:
 interface IPromotion {
   promotionName: string          // Promotion name (required, max 100 chars)
   userGroupName: string         // Target user group (required, max 100 chars)
-  type: 'event' | 'sale' | 'bonus' // Promotion type (required)
+  type: 'basic' | 'epic' | 'common' // Promotion type (required)
   startDate: Date              // Start date (required)
   endDate: Date                // End date (required)
   createdAt: Date              // Auto-generated timestamp
@@ -138,7 +138,7 @@ interface IPromotion {
 
 ### Promotion Validation
 - End date must be after start date (enforced at schema level)
-- Type must be one of: event, sale, bonus
+- Type must be one of: basic, epic, common
 - Promotion name and user group name are required and trimmed
 - Maximum length validation for text fields
 

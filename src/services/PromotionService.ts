@@ -30,9 +30,6 @@ export class PromotionService {
 
   async getPromotionById(id: string): Promise<PromotionResponse> {
     const promotion = await PromotionRepository.findById(id)
-    if (!promotion) {
-      throw NotFoundException.promotionNotFound({ id })
-    }
     return this.mapPromotion(promotion)
   }
 
@@ -65,17 +62,11 @@ export class PromotionService {
     }
 
     const promotion = await PromotionRepository.update(id, data)
-    if (!promotion) {
-      throw NotFoundException.promotionNotFound({ id })
-    }
     return this.mapPromotion(promotion)
   }
 
   async deletePromotion(id: string): Promise<boolean> {
     const deleted = await PromotionRepository.delete(id)
-    if (!deleted) {
-      throw NotFoundException.promotionNotFound({ id })
-    }
     return deleted
   }
 }

@@ -1,4 +1,4 @@
-export type PromotionType = 'event' | 'sale' | 'bonus'
+export type PromotionType = 'basic' | 'epic' | 'common'
 
 export interface CreatePromotionData {
   promotionName: string
