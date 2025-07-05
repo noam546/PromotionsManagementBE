@@ -106,14 +106,6 @@ The configuration is centralized in `src/config/index.ts` and provides:
 - `startDate`: Filter by start date
 - `endDate`: Filter by end date
 
-## Promotion Types
-
-The system supports three types of promotions:
-
-1. **Basic**: Basic promotions and offers
-2. **Epic**: Epic and premium promotions
-3. **Common**: Common and standard promotions
-
 ## Data Models
 
 ### Promotion Schema
@@ -136,18 +128,6 @@ interface IPromotion {
 - `yarn build`: Compile TypeScript
 - `yarn watch`: Watch mode for TypeScript compilation
 - `yarn dev`: Development mode with hot reload
-- `yarn check-schema`: Check database schema
-- `yarn migrate-schema`: Run schema migrations
-
-### Adding New Features
-
-1. **Models**: Define data schemas in `src/models/`
-2. **Repositories**: Add data access methods in `src/repositories/`
-3. **Services**: Implement business logic in `src/services/`
-4. **Controllers**: Handle HTTP requests in `src/controllers/`
-5. **Routes**: Define API endpoints in `src/routes/`
-6. **Middleware**: Add custom middleware in `src/middleware/`
-7. **Exceptions**: Create custom exceptions in `src/exceptions/`
 
 
 ## Dependencies
