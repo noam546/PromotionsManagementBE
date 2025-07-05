@@ -2,7 +2,7 @@
 curl -X POST http://localhost:8000/api/promotions \
   -H "Content-Type: application/json" \
   -d '{
-    "promotionName": "Adi Melamed",                    
+    "promotionName": "Add To Test4",                    
     "userGroupName": "Premium Users",    
     "type": "basic",
     "startDate": "2024-06-01T00:00:00.000Z",
@@ -24,4 +24,4 @@ curl -X PUT http://localhost:8000/api/promotions/686598ab821e396e22c8 \
 curl -X GET http://localhost:8000/api/promotions?page=1&limit=10
 
 # Delete a promotion
-curl -X DELETE http://localhost:8000/api/promotions/686585ae7a0d35b0573979d2
+curl -X DELETE http://localhost:8000/api/promotions/686924e60eef1cd262abf8c8
